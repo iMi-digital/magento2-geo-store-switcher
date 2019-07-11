@@ -50,10 +50,10 @@ class StoreSwitchAction
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Framework\App\RequestInterface $requestHelper
     ) {
-        $this->storeManager      = $storeManager;
-        $this->geoStoreSwitcher  = $geoStoreSwitcher;
-        $this->resultFactory     = $resultFactory;
-        $this->requestHelper     = $requestHelper;
+        $this->storeManager     = $storeManager;
+        $this->geoStoreSwitcher = $geoStoreSwitcher;
+        $this->resultFactory    = $resultFactory;
+        $this->requestHelper    = $requestHelper;
     }
 
     /**
@@ -61,14 +61,17 @@ class StoreSwitchAction
      */
     public function afterExecute()
     {
-        $targetStoreId = $this->getStoreIdBasedOnIP();
-        $currentStore  = $this->storeManager->getStore();
-        $resultFactory = $this->resultFactory;
-        if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
-            $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
-            $response    = $resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT)->setUrl($redirectUrl);
-        } else {
-            $response = $resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
+        $response = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
+
+        $storeLanguageCookie = $this->requestHelper->getCookie('storelanguage');
+        if ( ! isset($storeLanguageCookie)) {
+            $targetStoreId = $this->getStoreIdBasedOnIP();
+            $currentStore  = $this->storeManager->getStore();
+            if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
+                $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
+                $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
+                $response    = $redirect->setUrl($redirectUrl);
+            }
         }
         return $response;
     }
