@@ -59,10 +59,8 @@ class StoreSwitchAction
     /**
      * @return \Magento\Framework\Controller\ResultInterface
      */
-    public function afterExecute()
+    public function afterExecute($subject, $result)
     {
-        $response = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
-
         $storeLanguageCookie = $this->requestHelper->getCookie('storelanguage');
         if ( ! isset($storeLanguageCookie)) {
             $targetStoreId = $this->getStoreIdBasedOnIP();
@@ -70,10 +68,10 @@ class StoreSwitchAction
             if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
                 $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
                 $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
-                $response    = $redirect->setUrl($redirectUrl);
+                $result    = $redirect->setUrl($redirectUrl);
             }
         }
-        return $response;
+        return $result;
     }
 
     /**
