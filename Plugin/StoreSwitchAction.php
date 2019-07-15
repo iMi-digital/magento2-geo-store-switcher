@@ -31,15 +31,6 @@ class StoreSwitchAction
     private $requestHelper;
 
     /**
-     * @var array
-     */
-    private $disabledAreas = [
-        Area::AREA_ADMIN,
-        Area::AREA_ADMINHTML,
-        Area::AREA_CRONTAB
-    ];
-
-    /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher $geoStoreSwitcher
      * @param \Tobai\GeoStoreSwitcher\Model\Config\ScopeCodeResolver $scopeCodeResolver
