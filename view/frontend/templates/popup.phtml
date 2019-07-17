@@ -1,0 +1,32 @@
+<?php
+/* @var $viewModel \SATA\StoreSwitch\ViewModel\StoreSwitchModel */
+$viewModel = $block->getData('view_model');
+if ($viewModel->isModuleActive()): ?>
+
+    <div id="store-switcher-popup" style="display:none;">
+        <?php //FIXME use different message for IP not found?
+        ?>
+        <p><?= __('We have noticed that you are visiting this website from "%1".',
+                $viewModel->getCountryNameFromIp()) ?></p>
+        <p><?= __('If we have set the country incorrectly, please change the country using our country list (at the top right of the screen).') ?>
+            .</p>
+        <p><?= __('Thank you very much and enjoy your visit in the SATA-Shop.') ?></p>
+
+        <button class="action primary" type="button"
+                data-storelanguage="<?= $viewModel->getCurrentStore()->getCode() ?>"><?= __('Okay') ?></button>
+    </div>
+
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "SATA_StoreSwitch": {
+                            "component": "Tobai_GeoStoreSwitcher/js/store_switcher_popup"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<?php endif; ?>
