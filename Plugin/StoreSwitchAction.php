@@ -30,6 +30,8 @@ class StoreSwitchAction
      */
     private $requestHelper;
 
+    private $configGeneral;
+
     /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher $geoStoreSwitcher
@@ -39,12 +41,14 @@ class StoreSwitchAction
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher $geoStoreSwitcher,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
-        \Magento\Framework\App\RequestInterface $requestHelper
+        \Magento\Framework\App\RequestInterface $requestHelper,
+        \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral
     ) {
         $this->storeManager     = $storeManager;
         $this->geoStoreSwitcher = $geoStoreSwitcher;
         $this->resultFactory    = $resultFactory;
         $this->requestHelper    = $requestHelper;
+        $this->configGeneral    = $configGeneral;
     }
 
     /**
@@ -53,13 +57,13 @@ class StoreSwitchAction
     public function afterExecute($subject, $result)
     {
         $storeLanguageCookie = $this->requestHelper->getCookie('storelanguage');
-        if ( ! isset($storeLanguageCookie)) {
+        if ( ! isset($storeLanguageCookie) && $this->configGeneral->isAvailable()) {
             $targetStoreId = $this->getStoreIdBasedOnIP();
             $currentStore  = $this->storeManager->getStore();
             if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
                 $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
                 $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
-                $result    = $redirect->setUrl($redirectUrl);
+                $result      = $redirect->setUrl($redirectUrl);
             }
         }
         return $result;
