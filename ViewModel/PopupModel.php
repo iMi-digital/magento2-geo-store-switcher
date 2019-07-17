@@ -36,6 +36,11 @@ class PopupModel implements ArgumentInterface
     private $countryFactory;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * @var \Tobai\GeoStoreSwitcher\Model\Config\General
      */
     private $configGeneral;
@@ -52,12 +57,14 @@ class PopupModel implements ArgumentInterface
         StoreManager $storeManager,
         CountryInterface $countryHelper,
         CountryFactory $countryFactory,
-        \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral
+        \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->storeManager   = $storeManager;
         $this->countryHelper  = $countryHelper;
         $this->countryFactory = $countryFactory;
         $this->configGeneral  = $configGeneral;
+        $this->scopeConfig    = $scopeConfig;
     }
 
     /**
@@ -67,6 +74,11 @@ class PopupModel implements ArgumentInterface
     public function getCurrentStore(): StoreInterface
     {
         return $this->storeManager->getStore();
+    }
+
+    public function getStorename()
+    {
+        return $this->scopeConfig->getValue('general/store_information/name');
     }
 
     /**

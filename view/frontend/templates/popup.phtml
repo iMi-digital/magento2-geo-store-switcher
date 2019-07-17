@@ -1,5 +1,5 @@
 <?php
-/* @var $viewModel \SATA\StoreSwitch\ViewModel\StoreSwitchModel */
+/* @var $viewModel \Tobai\GeoStoreSwitcher\ViewModel\PopupModel */
 $viewModel = $block->getData('view_model');
 if ($viewModel->isModuleActive()): ?>
 
@@ -10,7 +10,7 @@ if ($viewModel->isModuleActive()): ?>
                 $viewModel->getCountryNameFromIp()) ?></p>
         <p><?= __('If we have set the country incorrectly, please change the country using our country list (at the top right of the screen).') ?>
             .</p>
-        <p><?= __('Thank you very much and enjoy your visit in the SATA-Shop.') ?></p>
+        <p><?= __('Thank you very much and enjoy your visit in the %1-Shop.', $viewModel->getStorename()) ?></p>
 
         <button class="action primary" type="button"
                 data-storelanguage="<?= $viewModel->getCurrentStore()->getCode() ?>"><?= __('Okay') ?></button>
@@ -21,7 +21,7 @@ if ($viewModel->isModuleActive()): ?>
             "*": {
                 "Magento_Ui/js/core/app": {
                     "components": {
-                        "SATA_StoreSwitch": {
+                        "Tobai_GeoStoreSwitcher": {
                             "component": "Tobai_GeoStoreSwitcher/js/store_switcher_popup"
                         }
                     }
