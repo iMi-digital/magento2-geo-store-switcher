@@ -8,8 +8,7 @@ if ($viewModel->isModuleActive()): ?>
         ?>
         <p><?= __('We have noticed that you are visiting this website from "%1".',
                 $viewModel->getCountryNameFromIp()) ?></p>
-        <p><?= __('If we have set the country incorrectly, please change the country using our country list (at the top right of the screen).') ?>
-            .</p>
+        <p><?= __('If we have set the country incorrectly, please change the country using our country list (at the top right of the screen).') ?></p>
         <p><?= __('Thank you very much and enjoy your visit in the %1-Shop.', $viewModel->getStorename()) ?></p>
 
         <button class="action primary" type="button"
