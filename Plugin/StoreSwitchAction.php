@@ -61,7 +61,12 @@ class StoreSwitchAction
             $targetStoreId = $this->getStoreIdBasedOnIP();
             $currentStore  = $this->storeManager->getStore();
             if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
-                $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
+                $redirectUrl = $this->storeManager->getStore($targetStoreId)->getUrl('*/*/*',
+                    [
+                        '_query' => $this->requestHelper->getParams(),
+                        '_direct' => $this->requestHelper->getPathInfo()
+                    ]
+                );
                 $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
                 $result      = $redirect->setUrl($redirectUrl);
             }
