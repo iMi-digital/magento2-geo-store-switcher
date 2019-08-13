@@ -30,7 +30,15 @@ class StoreSwitchAction
      */
     private $requestHelper;
 
+    /**
+     * @var \Tobai\GeoStoreSwitcher\Model\Config\General
+     */
     private $configGeneral;
+
+    /**
+     * @var \Magento\Store\ViewModel\SwitcherUrlProvider
+     */
+    private $switcherUrlProvider;
 
     /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -42,13 +50,15 @@ class StoreSwitchAction
         \Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher $geoStoreSwitcher,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Framework\App\RequestInterface $requestHelper,
-        \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral
+        \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral,
+	\Magento\Store\ViewModel\SwitcherUrlProvider $switcherUrlProvider
     ) {
         $this->storeManager     = $storeManager;
         $this->geoStoreSwitcher = $geoStoreSwitcher;
         $this->resultFactory    = $resultFactory;
         $this->requestHelper    = $requestHelper;
         $this->configGeneral    = $configGeneral;
+	    $this->switcherUrlProvider = $switcherUrlProvider;
     }
 
     /**
@@ -56,12 +66,17 @@ class StoreSwitchAction
      */
     public function afterExecute($subject, $result)
     {
+        if ($this->requestHelper->getModuleName() == 'stores') { // prevent endless loops
+            return $result;
+        }
+
         $storeLanguageCookie = $this->requestHelper->getCookie('storelanguage');
         if ( ! isset($storeLanguageCookie) && $this->configGeneral->isAvailable()) {
             $targetStoreId = $this->getStoreIdBasedOnIP();
             $currentStore  = $this->storeManager->getStore();
             if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
-                $redirectUrl = rtrim($this->storeManager->getStore($targetStoreId)->getUrl(),'/') . $this->requestHelper->getPathInfo();
+                $targetStore = $this->storeManager->getStore($targetStoreId);
+                $redirectUrl = $this->switcherUrlProvider->getTargetStoreRedirectUrl($targetStore);
                 $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
                 $result      = $redirect->setUrl($redirectUrl);
             }
