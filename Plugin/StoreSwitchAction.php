@@ -58,7 +58,7 @@ class StoreSwitchAction
         $this->resultFactory    = $resultFactory;
         $this->requestHelper    = $requestHelper;
         $this->configGeneral    = $configGeneral;
-	    $this->switcherUrlProvider = $switcherUrlProvider;
+	      $this->switcherUrlProvider = $switcherUrlProvider;
     }
 
     /**
