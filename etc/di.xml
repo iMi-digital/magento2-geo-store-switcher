@@ -9,9 +9,6 @@
     <type name="Magento\Store\Api\StoreResolverInterface">
         <plugin name="tobai-geo-store-switcher" type="Tobai\GeoStoreSwitcher\Plugin\StoreResolver" sortOrder="999" />
     </type>
-    <type name="Magento\Framework\App\PageCache\Identifier">
-        <plugin name="tobai-geo-store-switcher" type="Tobai\GeoStoreSwitcher\Plugin\PageCache\GeoIdentifier" />
-    </type>
     <type name="Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher\RulePool">
         <arguments>
             <argument name="rules" xsi:type="array">
