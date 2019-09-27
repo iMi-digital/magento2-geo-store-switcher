@@ -8,7 +8,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\ObjectManager;
 use Tobai\GeoStoreSwitcher\Model\Config\Backend\ScopeConfig as BackendScopeConfig;
 
-class StoreSwitchAction
+class StoreSwitchRedirect
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -41,6 +41,11 @@ class StoreSwitchAction
     private $switcherUrlProvider;
 
     /**
+     * @var \Magento\Store\Model\StoreSwitcherInterface
+     */
+    private $storeSwitcher;
+
+    /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Tobai\GeoStoreSwitcher\Model\GeoStore\Switcher $geoStoreSwitcher
      * @param \Tobai\GeoStoreSwitcher\Model\Config\ScopeCodeResolver $scopeCodeResolver
@@ -51,37 +56,38 @@ class StoreSwitchAction
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Framework\App\RequestInterface $requestHelper,
         \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral,
-	\Magento\Store\ViewModel\SwitcherUrlProvider $switcherUrlProvider
+        \Magento\Store\ViewModel\SwitcherUrlProvider $switcherUrlProvider,
+        \Magento\Store\Model\StoreSwitcherInterface $storeSwitcher
     ) {
-        $this->storeManager     = $storeManager;
+        $this->storeManager = $storeManager;
         $this->geoStoreSwitcher = $geoStoreSwitcher;
-        $this->resultFactory    = $resultFactory;
-        $this->requestHelper    = $requestHelper;
-        $this->configGeneral    = $configGeneral;
-	      $this->switcherUrlProvider = $switcherUrlProvider;
+        $this->resultFactory = $resultFactory;
+        $this->requestHelper = $requestHelper;
+        $this->configGeneral = $configGeneral;
+        $this->switcherUrlProvider = $switcherUrlProvider;
+        $this->storeSwitcher = $storeSwitcher;
     }
 
-    /**
-     * @return \Magento\Framework\Controller\ResultInterface
-     */
-    public function afterExecute($subject, $result)
+    public function aroundDispatch(
+        \Magento\Framework\App\FrontControllerInterface $subject,
+        \Closure $proceed,
+        \Magento\Framework\App\RequestInterface $request
+    )
     {
-        if ($this->requestHelper->getModuleName() == 'stores') { // prevent endless loops
-            return $result;
-        }
-
         $storeLanguageCookie = $this->requestHelper->getCookie('storelanguage');
         if ( ! isset($storeLanguageCookie) && $this->configGeneral->isAvailable()) {
             $targetStoreId = $this->getStoreIdBasedOnIP();
-            $currentStore  = $this->storeManager->getStore();
+            $currentStore = $this->storeManager->getStore();
             if ($targetStoreId && ($currentStore->getId() != $targetStoreId)) {
                 $targetStore = $this->storeManager->getStore($targetStoreId);
-                $redirectUrl = $this->switcherUrlProvider->getTargetStoreRedirectUrl($targetStore);
-                $redirect    = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
-                $result      = $redirect->setUrl($redirectUrl);
+                $redirectUrl = $this->storeSwitcher->switch($currentStore, $targetStore, $targetStore->getCurrentUrl());
+                $redirect = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
+                $redirect->setHeader('Cache-Control', 'no-cache'); // This prevents the page cache from failing hard
+                return $redirect->setUrl($redirectUrl);
             }
         }
-        return $result;
+
+        return $proceed($request);
     }
 
     /**
@@ -91,6 +97,7 @@ class StoreSwitchAction
     {
         $this->geoStoreSwitcher->initCurrentStore();
         $storeId = $this->geoStoreSwitcher->getCurrentStoreId();
+
         return $storeId;
     }
 }
