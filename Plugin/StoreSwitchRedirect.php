@@ -36,11 +36,6 @@ class StoreSwitchRedirect
     private $configGeneral;
 
     /**
-     * @var \Magento\Store\ViewModel\SwitcherUrlProvider
-     */
-    private $switcherUrlProvider;
-
-    /**
      * @var \Magento\Store\Model\StoreSwitcherInterface
      */
     private $storeSwitcher;
@@ -56,7 +51,6 @@ class StoreSwitchRedirect
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Framework\App\RequestInterface $requestHelper,
         \Tobai\GeoStoreSwitcher\Model\Config\General $configGeneral,
-        \Magento\Store\ViewModel\SwitcherUrlProvider $switcherUrlProvider,
         \Magento\Store\Model\StoreSwitcherInterface $storeSwitcher
     ) {
         $this->storeManager = $storeManager;
@@ -64,10 +58,18 @@ class StoreSwitchRedirect
         $this->resultFactory = $resultFactory;
         $this->requestHelper = $requestHelper;
         $this->configGeneral = $configGeneral;
-        $this->switcherUrlProvider = $switcherUrlProvider;
         $this->storeSwitcher = $storeSwitcher;
     }
 
+    /**
+     * @param \Magento\Framework\App\FrontControllerInterface $subject
+     * @param \Closure $proceed
+     * @param \Magento\Framework\App\RequestInterface $request
+     *
+     * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Store\Model\StoreSwitcher\CannotSwitchStoreException
+     */
     public function aroundDispatch(
         \Magento\Framework\App\FrontControllerInterface $subject,
         \Closure $proceed,
