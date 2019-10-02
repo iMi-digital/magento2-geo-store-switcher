@@ -8,6 +8,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\App\FrontControllerInterface">
         <plugin name="tobai-geo-store-switcher-redirector" type="Tobai\GeoStoreSwitcher\Plugin\StoreSwitchRedirect"
-                sortOrder="1"/>
+                sortOrder="-10"/>
     </type>
 </config>

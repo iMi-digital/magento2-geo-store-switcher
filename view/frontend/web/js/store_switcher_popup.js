@@ -1,16 +1,15 @@
 define([
     'uiComponent',
     'jquery',
-    'Magento_Ui/js/modal/modal',
-    'SATA_StoreSwitch/js/store_switcher_cookie'
-], function (Component, $, modal, store_switcher_cookie) {
+    'Magento_Ui/js/modal/modal'
+], function (Component, $, modal) {
     'use strict';
-    let $modalContainer = $("#store-switcher-popup");
-    let cookieHandler = new store_switcher_cookie;
+
+    var $modalContainer = $("#store-switcher-popup");
+
     return Component.extend({
 
         initialize: function () {
-
             var options = {
                 type: 'popup',
                 responsive: true,
@@ -19,25 +18,24 @@ define([
             };
 
             var switcher_popup_element = $('#store-switcher-popup');
-            var popup = modal(options, switcher_popup_element);
+            modal(options, switcher_popup_element);
 
-            switcher_popup_element.css("display", "block");
-
-            if (!cookieHandler.getStoreLanguageCookie()) {
+            if (this.isRedirected()) {
                 this.openSwitcherModal();
+                this.addEventListeners();
             }
-            this.addEventListeners();
         },
-
         openSwitcherModal: function () {
             $modalContainer.modal('openModal');
-            cookieHandler.setStoreLanguageCookie(cookieHandler.getActiveStoreLanguage());
         },
-
         addEventListeners: function () {
             $('#store-switcher-popup button').click(function () {
                 $modalContainer.modal('closeModal');
             });
+        },
+        isRedirected: function () {
+            var url = new URL(window.location.href);
+            return url.searchParams.get('redirected');
         }
     });
 });
