@@ -124,10 +124,9 @@ class StoreSwitchRedirect
         \Magento\Framework\App\FrontControllerInterface $subject,
         \Closure $proceed,
         \Magento\Framework\App\RequestInterface $request
-    )
-    {
-       $storeLanguageCookie = $this->requestHelper->getCookie(self::GEO_STORE_SWITCH_COOKIE, null);
-        if (!isset($storeLanguageCookie) && $this->configGeneral->isAvailable()) {
+    ) {
+        $storeLanguageCookie = $this->requestHelper->getCookie(self::GEO_STORE_SWITCH_COOKIE, null);
+        if ( ! isset($storeLanguageCookie) && $this->configGeneral->isAvailable()) {
             $this->setCookie();
             $this->setTargetStoreIdBasedOnIp();
             $this->setCurrentStore();
@@ -162,7 +161,12 @@ class StoreSwitchRedirect
         $targetStore = $this->storeManager->getStore($this->targetStoreId);
         $redirectUrl = $this->storeSwitcher->switch($this->currentStore, $targetStore, $targetStore->getCurrentUrl());
 
-        return $redirectUrl . '?redirected=1';
+        $queryParam = '?';
+        if (strpos($redirectUrl, '?') !== false) {
+            $queryParam = '&';
+        }
+
+        return $redirectUrl . $queryParam . 'redirected=1';
     }
 
     /**
